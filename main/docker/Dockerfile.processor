@@ -1,0 +1,45 @@
+#Data Processing Container
+
+FROM python:3.9-slim
+
+LABEL maintainer="Anton Nesterenko"
+LABEL description="MLOps Data Processor"
+
+# Системні залежності для обробки даних
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    libpq-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Копіювання залежностей
+COPY requirements.txt .
+
+# Встановлення Python пакетів
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Копіювання коду
+COPY scripts/ ./scripts/
+COPY params.yaml .
+COPY dvc.yaml .
+
+# Створення директорій
+RUN mkdir -p data/{raw,labeled,processed} logs metrics
+
+# Ініціалізація DVC
+RUN dvc init --no-scm
+
+# Змінні середовища
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Команда за замовчуванням
+CMD ["python", "-m", "scripts.setup_data"]

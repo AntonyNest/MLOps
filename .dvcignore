@@ -1,0 +1,42 @@
+# DVC Ignore Rules
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Virtual environments
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Documentation
+docs/
+
+# Git files
+.git/
+.gitignore
+
+# Docker files
+docker-compose.yml
+Dockerfile*
+
+# Configuration files
+*.env
+.env.*

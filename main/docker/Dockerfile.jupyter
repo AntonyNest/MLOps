@@ -1,0 +1,37 @@
+# Jupyter Analytics Container  
+
+FROM jupyter/scipy-notebook:latest
+
+LABEL maintainer="Anton Nesterenko"
+LABEL description="MLOps Jupyter Analytics Environment"
+
+USER root
+
+# Додаткові системні пакети
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+USER $NB_UID
+
+# Встановлення додаткових Python пакетів
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Встановлення Jupyter extensions
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+RUN jupyter labextension install plotlywidget
+
+# Копіювання notebook'ів
+COPY notebooks/ /home/jovyan/work/notebooks/
+
+# Налаштування Jupyter
+RUN echo "c.NotebookApp.token = ''" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
+RUN echo "c.NotebookApp.password = ''" >> /home/jovyan/.jupyter/jupyter_notebook_config.py
+
+# Змінні середовища
+ENV JUPYTER_ENABLE_LAB=yes
+ENV PYTHONPATH=/home/jovyan/work
+
+WORKDIR /home/jovyan/work

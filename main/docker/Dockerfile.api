@@ -1,0 +1,56 @@
+# API Server Container
+
+
+FROM python:3.9-slim as base
+
+LABEL maintainer="Anton Nesterenko"
+LABEL description="MLOps API Server"
+
+# Системні залежності
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Безпека
+RUN groupadd -r apiuser && useradd -r -g apiuser apiuser
+
+WORKDIR /app
+
+# Python залежності
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Додаткові залежності для API
+RUN pip install --no-cache-dir \
+    fastapi==0.104.1 \
+    uvicorn[standard]==0.24.0 \
+    python-multipart==0.0.6
+
+FROM base as production
+
+# Копіювання API коду
+COPY api/ ./api/
+COPY scripts/ ./scripts/
+COPY params.yaml .
+
+# Права доступу
+RUN chown -R apiuser:apiuser /app
+USER apiuser
+
+# Змінні середовища
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Порт
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Запуск API
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

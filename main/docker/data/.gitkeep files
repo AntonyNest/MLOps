@@ -1,0 +1,10 @@
+# Create placeholder files for empty directories
+
+# data/raw/.gitkeep
+# This file ensures the directory is tracked by git
+
+# data/labeled/.gitkeep  
+# This file ensures the directory is tracked by git
+
+# data/processed/.gitkeep
+# This file ensures the directory is tracked by git

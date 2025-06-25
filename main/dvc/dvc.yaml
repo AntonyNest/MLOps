@@ -1,0 +1,30 @@
+stages:
+  prepare_data:
+    cmd: python scripts/setup_data.py
+    deps:
+      - data/raw
+    outs:
+      - data/prepared
+    params:
+      - prepare.sample_size
+      - prepare.validation_split
+
+  label_export:
+    cmd: python scripts/export_labels.py
+    deps:
+      - data/prepared
+    outs:
+      - data/labeled/annotations.json
+    params:
+      - labeling.export_format
+      - labeling.include_metadata
+
+  validate:
+    cmd: python scripts/validate_data.py
+    deps:
+      - data/labeled
+    metrics:
+      - metrics/data_quality.json
+    params:
+      - validation.min_samples
+      - validation.quality_threshold
