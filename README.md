@@ -8,7 +8,8 @@ cd MLOps
 ## Створення віртуального середовища
 python -m venv venv
 source venv/bin/activate  # Linux/Mac
-# або venv\Scripts\activate  # Windows
+
+#### або venv\Scripts\activate  # Windows
 
 ## Встановлення залежностей
 pip install -r requirements.txt
