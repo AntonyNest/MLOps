@@ -54,7 +54,6 @@ postgres-data
 mydata
 
 *.pt
-setuniversity-mlops-s25
 dataset
 kaggle-dataset
 

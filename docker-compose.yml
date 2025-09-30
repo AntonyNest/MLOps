@@ -1,18 +1,20 @@
+version: '3.8'
+
 services:
   # PostgreSQL - база даних для Label Studio
   db:
     image: postgres:15
     container_name: db-1
     environment:
-      POSTGRES_DB: $(DB_NAME)
-      POSTGRES_USER: $(DB_USER)
-      POSTGRES_PASSWORD: $(DB_PASSWORD)
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U labelstudio -d labelstudio"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -23,11 +25,11 @@ services:
     container_name: minio-1
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: $(MINIO_ADMIN)
-      MINIO_ROOT_PASSWORD: $(MINIO_ADMIN_PASSWORD)
+      MINIO_ROOT_USER: ${MINIO_ADMIN_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ADMIN_USER_PASSWORD}
     ports:
       - "9000:9000"  # API порт
-      - "9009:9001"  # Web консоль (твій порт з завдання)
+      - "9009:9001"  # Web консоль
     volumes:
       - minio_data:/data
     healthcheck:
@@ -42,16 +44,16 @@ services:
     container_name: app-1
     environment:
       # Підключення до PostgreSQL
-      POSTGRE_NAME: labelstudio
-      POSTGRE_USER: labelstudio
-      POSTGRE_PASSWORD: labelstudio123
+      POSTGRE_NAME: ${DB_NAME}
+      POSTGRE_USER: ${DB_USER}
+      POSTGRE_PASSWORD: ${DB_PASSWORD}
       POSTGRE_HOST: db
       POSTGRE_PORT: 5432
 
       # Налаштування Label Studio
       LABEL_STUDIO_HOST: http://localhost:8080
-      LABEL_STUDIO_USERNAME: $(LABEL_STUDIO_ADMIN_USERNAME)
-      LABEL_STUDIO_PASSWORD: $(LABEL_STUDIO_ADMIN_PASSWORD)
+      LABEL_STUDIO_USERNAME: ${LABEL_STUDIO_ADMIN_USERNAME}
+      LABEL_STUDIO_PASSWORD: ${LABEL_STUDIO_ADMIN_PASSWORD}
     ports:
       - "8080:8080"
     volumes:
